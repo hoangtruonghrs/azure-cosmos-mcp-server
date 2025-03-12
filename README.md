@@ -94,6 +94,10 @@ You should now have successfully configured the MCP server for Azure Cosmos DB w
 
 
 
+
+https://github.com/user-attachments/assets/ae3a14f3-9ca1-415d-8645-1c8367fd6943
+
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
