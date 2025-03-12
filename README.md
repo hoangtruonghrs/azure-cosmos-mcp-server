@@ -1,14 +1,98 @@
-# Project
+# Azure Cosmos DB MCP  Server
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+<div align="center">
+  <img src="./src/img/logo.png" alt="Azure Cosmos DB MCP server logo" width="400"/>
+</div>
 
-As the maintainer of this project, please make a few updates:
+## What is this? 🤔
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+This is a server that lets your LLMs (like Claude) talk directly to your Azure Cosmos DB data! Think of it as a friendly translator that sits between your AI assistant and your database, making sure they can chat securely and efficiently.
+
+### Quick Example
+```text
+You: "What were our top 10 customers last month?"
+Claude: *queries your Azure Cosmos DB database and gives you the answer in plain English*
+```
+
+
+## How Does It Work? 🛠️
+
+This server leverages the Model Context Protocol (MCP), a versatile framework that acts as a universal translator between AI models and databases. Although MCP is built to support any AI model, it is currently accessible as a developer preview in Claude Desktop.
+
+Here's all you need to do:
+1. Set up project (see below)
+2. Add your project details to Claude Desktop's config file
+3. Start chatting with your Azure Cosmos DB data naturally!
+
+### What Can It Do? 📊
+
+- Run Azure Cosmos DB queries by just asking questions in plain English
+
+## Quick Start 🚀
+
+### Prerequisites
+- Node.js 14 or higher
+- Azure Cosmos DB NOSQL account or Azure Cosmos DB Emulator
+- Claude Desktop 
+
+### Set up project
+
+- Obtain Azure Cosmos DB NOSQL account URI and the KEY from the keys section and create an '.env' file with the below key and replace the values
+
+```
+COSMOSDB_URI=
+COSMOSDB_KEY= 
+```
+
+### Getting Started
+
+1. **Install Dependencies**  
+   Run the following command in the root folder to install all necessary dependencies:  
+   ```bash
+   npm install
+   ```
+
+2. **Build the Project**  
+   Compile the project by running:  
+   ```bash
+   npm run build
+   ```
+
+3. **Start the Server**  
+   Navigate to the `dist` folder and start the server:  
+   ```bash
+   npm start
+   ```
+
+4. **Confirmation Message**  
+   You should see the following message:  
+   ```
+   Azure Cosmos DB Server running on stdio
+   ```
+
+### Add your project details to Claude Destkop's config file
+
+Open Claude Desktop and Navigate to File -> Settings -> Developer -> Edit Config and open the `claude_desktop_config` file and replace with the values below,
+
+```json
+{
+  "mcpServers": {
+    "cosmosdb": {
+      "command": "node",
+      "args": [ "C:/Cosmos/azure-cosmos-mcp/dist/index.js" ] // Your Path for the Azure Cosmos DB MCP server file,
+      "env": {
+        "COSMOSDB_URI": "Your Cosmos DB Account URI",
+        "COSMOSDB_KEY": "Your Cosmos DB KEY"
+      }
+    }
+  }
+}
+
+```
+
+You should now have successfully configured the MCP server for Azure Cosmos DB with Claude Desktop. This setup allows you to seamlessly interact with Azure Cosmos DB through the MCP server as shown below.
+
+
 
 ## Contributing
 
