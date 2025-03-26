@@ -12,6 +12,7 @@ import { CertificateClient } from "@azure/keyvault-certificates";
 import * as dotenv from "dotenv";
 dotenv.config();
 import { DefaultAzureCredential } from "@azure/identity";
+import ExcelJS from 'exceljs'; // Importing exceljs
 
 // Cosmos DB client initialization
 const cosmosClient = new CosmosClient({
@@ -252,11 +253,40 @@ async function listCertificates() {
       certificates.push(certificateProperties);
     }
 
-    console.log("Certificates:", certificates); // Debugging statement
+    // Create a new workbook and worksheet
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Certificates');
+
+    // Add column headers
+    worksheet.columns = [
+      { header: 'Name', key: 'name', width: 30 },
+      { header: 'Version', key: 'version', width: 30 },
+      { header: 'Enabled', key: 'enabled', width: 10 },
+      { header: 'Not Before', key: 'notBefore', width: 20 },
+      { header: 'Expires On', key: 'expiresOn', width: 20 },
+      { header: 'Created On', key: 'createdOn', width: 20 },
+      { header: 'Updated On', key: 'updatedOn', width: 20 },
+    ];
+
+    // Add rows
+    certificates.forEach(cert => {
+      worksheet.addRow({
+        name: cert.name,
+        version: cert.version,
+        enabled: cert.enabled,
+        notBefore: cert.notBefore,
+        expiresOn: cert.expiresOn,
+        createdOn: cert.createdOn,
+        updatedOn: cert.updatedOn,
+      });
+    });
+
+    // Save the workbook to the local file system
+    await workbook.xlsx.writeFile('certificates.xlsx');
 
     return {
       success: true,
-      message: `Certificates listed successfully`,
+      message: `Certificates listed and saved to Excel file successfully`,
       certificates,
     };
   } catch (error) {
