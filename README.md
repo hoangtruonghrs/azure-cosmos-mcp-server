@@ -1,4 +1,4 @@
-# Azure Cosmos DB MCP  Server
+# Azure Cosmos DB and Key Vault MCP Server
 
 <div align="center">
   <img src="./src/img/logo.png" alt="Azure Cosmos DB MCP server logo" width="400"/>
@@ -6,33 +6,38 @@
 
 ## What is this? 🤔
 
-This is a server that lets your LLMs (like Claude) talk directly to your Azure Cosmos DB data! Think of it as a friendly translator that sits between your AI assistant and your database, making sure they can chat securely and efficiently.
+This is a server that lets your LLMs (like Claude) talk directly to your Azure Cosmos DB data and Azure Key Vault secrets! Think of it as a friendly translator that sits between your AI assistant and your database and key vault, making sure they can chat securely and efficiently.
 
 ### Quick Example
 ```text
 You: "What were our top 10 customers last month?"
 Claude: *queries your Azure Cosmos DB database and gives you the answer in plain English*
-```
 
+You: "Retrieve the secret value for 'mySecret'"
+Claude: *fetches the secret value from Azure Key Vault and provides it to you*
+```
 
 ## How Does It Work? 🛠️
 
-This server leverages the Model Context Protocol (MCP), a versatile framework that acts as a universal translator between AI models and databases. Although MCP is built to support any AI model, it is currently accessible as a developer preview in Claude Desktop.
+This server leverages the Model Context Protocol (MCP), a versatile framework that acts as a universal translator between AI models and databases and key vaults. Although MCP is built to support any AI model, it is currently accessible as a developer preview in Claude Desktop.
 
 Here's all you need to do:
 1. Set up project (see below)
 2. Add your project details to Claude Desktop's config file
-3. Start chatting with your Azure Cosmos DB data naturally!
+3. Start chatting with your Azure Cosmos DB data and Azure Key Vault secrets naturally!
 
 ### What Can It Do? 📊
 
 - Run Azure Cosmos DB queries by just asking questions in plain English
+- Retrieve secret values from Azure Key Vault
+- Check whether a certificate in Azure Key Vault is nearly expired
 
 ## Quick Start 🚀
 
 ### Prerequisites
 - Node.js 14 or higher
 - Azure Cosmos DB NOSQL account or Azure Cosmos DB Emulator
+- Azure Key Vault
 - Claude Desktop 
 
 ### Set up project
@@ -42,6 +47,7 @@ Here's all you need to do:
 ```
 COSMOSDB_URI=
 COSMOSDB_KEY= 
+KEYVAULT_URI=
 ```
 
 ### Getting Started
@@ -67,7 +73,7 @@ COSMOSDB_KEY=
 4. **Confirmation Message**  
    You should see the following message:  
    ```
-   Azure Cosmos DB Server running on stdio
+   Azure Cosmos DB and Key Vault Server running on stdio
    ```
 
 ### Add your project details to Claude Destkop's config file
@@ -82,21 +88,31 @@ Open Claude Desktop and Navigate to File -> Settings -> Developer -> Edit Config
       "args": [ "C:/Cosmos/azure-cosmos-mcp/dist/index.js" ] // Your Path for the Azure Cosmos DB MCP server file,
       "env": {
         "COSMOSDB_URI": "Your Cosmos DB Account URI",
-        "COSMOSDB_KEY": "Your Cosmos DB KEY"
+        "COSMOSDB_KEY": "Your Cosmos DB KEY",
+        "KEYVAULT_URI": "Your Key Vault URI"
       }
     }
   }
 }
-
 ```
 
-You should now have successfully configured the MCP server for Azure Cosmos DB with Claude Desktop. This setup allows you to seamlessly interact with Azure Cosmos DB through the MCP server as shown below.
+You should now have successfully configured the MCP server for Azure Cosmos DB and Azure Key Vault with Claude Desktop. This setup allows you to seamlessly interact with Azure Cosmos DB and Azure Key Vault through the MCP server as shown below.
 
+### Examples
 
+#### Retrieving a Secret from Azure Key Vault
 
+```text
+You: "Retrieve the secret value for 'mySecret'"
+Claude: *fetches the secret value from Azure Key Vault and provides it to you*
+```
 
-https://github.com/user-attachments/assets/ae3a14f3-9ca1-415d-8645-1c8367fd6943
+#### Checking Certificate Expiry in Azure Key Vault
 
+```text
+You: "Check if the certificate 'myCertificate' is nearly expired"
+Claude: *checks the expiry date of the certificate in Azure Key Vault and informs you of the days remaining until expiry*
+```
 
 ## Contributing
 
