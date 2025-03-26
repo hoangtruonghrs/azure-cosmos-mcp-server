@@ -92,11 +92,59 @@ Open Claude Desktop and Navigate to File -> Settings -> Developer -> Edit Config
 
 You should now have successfully configured the MCP server for Azure Cosmos DB with Claude Desktop. This setup allows you to seamlessly interact with Azure Cosmos DB through the MCP server as shown below.
 
+### New Tools
 
+#### `delete_item`
 
+Deletes an item from a Azure Cosmos DB container by its ID.
 
-https://github.com/user-attachments/assets/ae3a14f3-9ca1-415d-8645-1c8367fd6943
+**Input Schema:**
+```json
+{
+  "type": "object",
+  "properties": {
+    "containerName": { "type": "string", "description": "Name of the container" },
+    "id": { "type": "string", "description": "ID of the item to delete" }
+  },
+  "required": ["containerName", "id"]
+}
+```
 
+**Usage Example:**
+```json
+{
+  "tool": "delete_item",
+  "params": {
+    "containerName": "tasks",
+    "id": "item-id"
+  }
+}
+```
+
+#### `list_items`
+
+Lists all items in a Azure Cosmos DB container.
+
+**Input Schema:**
+```json
+{
+  "type": "object",
+  "properties": {
+    "containerName": { "type": "string", "description": "Name of the container" }
+  },
+  "required": ["containerName"]
+}
+```
+
+**Usage Example:**
+```json
+{
+  "tool": "list_items",
+  "params": {
+    "containerName": "tasks"
+  }
+}
+```
 
 ## Contributing
 

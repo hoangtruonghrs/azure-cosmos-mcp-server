@@ -74,6 +74,30 @@ const QUERY_CONTAINER_TOOL: Tool = {
   },
 };
 
+const DELETE_ITEM_TOOL: Tool = {
+  name: "delete_item",
+  description: "Deletes an item from a Azure Cosmos DB container by its ID",
+  inputSchema: {
+    type: "object",
+    properties: {
+      containerName: { type: "string", description: "Name of the container" },
+      id: { type: "string", description: "ID of the item to delete" },
+    },
+    required: ["containerName", "id"],
+  },
+};
+
+const LIST_ITEMS_TOOL: Tool = {
+  name: "list_items",
+  description: "Lists all items in a Azure Cosmos DB container",
+  inputSchema: {
+    type: "object",
+    properties: {
+      containerName: { type: "string", description: "Name of the container" },
+    },
+    required: ["containerName"],
+  },
+};
 
 async function updateItem(params: any) {
   try {
@@ -158,6 +182,41 @@ async function queryContainer(params: any) {
   }
 }
 
+async function deleteItem(params: any) {
+  try {
+    const { id } = params;
+    await container.item(id).delete();
+
+    return {
+      success: true,
+      message: `Item deleted successfully`,
+    };
+  } catch (error) {
+    console.error("Error deleting item:", error);
+    return {
+      success: false,
+      message: `Failed to delete item: ${error}`,
+    };
+  }
+}
+
+async function listItems(params: any) {
+  try {
+    const { resources } = await container.items.readAll().fetchAll();
+
+    return {
+      success: true,
+      message: `Items listed successfully`,
+      items: resources,
+    };
+  } catch (error) {
+    console.error("Error listing items:", error);
+    return {
+      success: false,
+      message: `Failed to list items: ${error}`,
+    };
+  }
+}
 
 const server = new Server(
   {
@@ -173,7 +232,7 @@ const server = new Server(
 
 // Request handlers
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [PUT_ITEM_TOOL, GET_ITEM_TOOL, QUERY_CONTAINER_TOOL, UPDATE_ITEM_TOOL],
+  tools: [PUT_ITEM_TOOL, GET_ITEM_TOOL, QUERY_CONTAINER_TOOL, UPDATE_ITEM_TOOL, DELETE_ITEM_TOOL, LIST_ITEMS_TOOL],
 }));
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
@@ -193,6 +252,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         break;
       case "update_item":
         result = await updateItem(args);
+        break;
+      case "delete_item":
+        result = await deleteItem(args);
+        break;
+      case "list_items":
+        result = await listItems(args);
         break;
       default:
         return {
