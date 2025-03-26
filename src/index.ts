@@ -11,7 +11,7 @@ import { SecretClient } from "@azure/keyvault-secrets";
 import { CertificateClient } from "@azure/keyvault-certificates";
 import * as dotenv from "dotenv";
 dotenv.config();
-
+import { DefaultAzureCredential } from "@azure/identity";
 
 // Cosmos DB client initialization
 const cosmosClient = new CosmosClient({
@@ -213,6 +213,10 @@ async function checkCertificateExpiry(params: any) {
     const certificate = await certificateClient.getCertificate(certificateName);
 
     const expiryDate = certificate.properties.expiresOn;
+    if (!expiryDate) {
+      throw new Error("Expiry date is undefined");
+    }
+
     const currentDate = new Date();
     const timeDiff = expiryDate.getTime() - currentDate.getTime();
     const daysToExpiry = Math.ceil(timeDiff / (1000 * 3600 * 24));
