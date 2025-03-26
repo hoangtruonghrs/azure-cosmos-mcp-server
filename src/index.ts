@@ -252,6 +252,8 @@ async function listCertificates() {
       certificates.push(certificateProperties);
     }
 
+    console.log("Certificates:", certificates); // Debugging statement
+
     return {
       success: true,
       message: `Certificates listed successfully`,
