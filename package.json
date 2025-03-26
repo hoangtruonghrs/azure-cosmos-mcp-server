@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "bin": {
-    "mcp-server-dynamodb": "dist/index.js"
+    "mcp-server-dynamodb": "dist/index.js",
+    "mcp-server-keyvault": "dist/index.js"
   },
   "scripts": {
     "build": "tsc && shx chmod +x dist/*.js",
@@ -25,7 +26,9 @@
     "@azure/cosmos": "^4.2.0",
     "@azure/identity": "^4.7.0",
     "@modelcontextprotocol/sdk": "^1.0.0",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "@azure/keyvault-secrets": "^4.2.0",
+    "@azure/keyvault-certificates": "^4.2.0"
   },
   "type": "module"
 }

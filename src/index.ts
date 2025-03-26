@@ -7,6 +7,8 @@ import {
   Tool,
 } from "@modelcontextprotocol/sdk/types.js";
 import { CosmosClient } from "@azure/cosmos";
+import { SecretClient } from "@azure/keyvault-secrets";
+import { CertificateClient } from "@azure/keyvault-certificates";
 import * as dotenv from "dotenv";
 dotenv.config();
 
@@ -18,6 +20,11 @@ const cosmosClient = new CosmosClient({
 });
 
 const container = cosmosClient.database("todos").container("tasks");
+
+// Key Vault clients initialization
+const keyVaultUrl = process.env.KEYVAULT_URI!;
+const secretClient = new SecretClient(keyVaultUrl, new DefaultAzureCredential());
+const certificateClient = new CertificateClient(keyVaultUrl, new DefaultAzureCredential());
 
 // Tool definitions
 const UPDATE_ITEM_TOOL: Tool = {
@@ -74,6 +81,29 @@ const QUERY_CONTAINER_TOOL: Tool = {
   },
 };
 
+const GET_SECRET_TOOL: Tool = {
+  name: "get_secret",
+  description: "Retrieves a secret value from Azure Key Vault",
+  inputSchema: {
+    type: "object",
+    properties: {
+      secretName: { type: "string", description: "Name of the secret" },
+    },
+    required: ["secretName"],
+  },
+};
+
+const CHECK_CERTIFICATE_EXPIRY_TOOL: Tool = {
+  name: "check_certificate_expiry",
+  description: "Checks whether a certificate in Azure Key Vault is nearly expired",
+  inputSchema: {
+    type: "object",
+    properties: {
+      certificateName: { type: "string", description: "Name of the certificate" },
+    },
+    required: ["certificateName"],
+  },
+};
 
 async function updateItem(params: any) {
   try {
@@ -158,6 +188,48 @@ async function queryContainer(params: any) {
   }
 }
 
+async function getSecret(params: any) {
+  try {
+    const { secretName } = params;
+    const secret = await secretClient.getSecret(secretName);
+
+    return {
+      success: true,
+      message: `Secret retrieved successfully`,
+      secret: secret.value,
+    };
+  } catch (error) {
+    console.error("Error getting secret:", error);
+    return {
+      success: false,
+      message: `Failed to get secret: ${error}`,
+    };
+  }
+}
+
+async function checkCertificateExpiry(params: any) {
+  try {
+    const { certificateName } = params;
+    const certificate = await certificateClient.getCertificate(certificateName);
+
+    const expiryDate = certificate.properties.expiresOn;
+    const currentDate = new Date();
+    const timeDiff = expiryDate.getTime() - currentDate.getTime();
+    const daysToExpiry = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+    return {
+      success: true,
+      message: `Certificate expiry checked successfully`,
+      daysToExpiry,
+    };
+  } catch (error) {
+    console.error("Error checking certificate expiry:", error);
+    return {
+      success: false,
+      message: `Failed to check certificate expiry: ${error}`,
+    };
+  }
+}
 
 const server = new Server(
   {
@@ -173,7 +245,14 @@ const server = new Server(
 
 // Request handlers
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [PUT_ITEM_TOOL, GET_ITEM_TOOL, QUERY_CONTAINER_TOOL, UPDATE_ITEM_TOOL],
+  tools: [
+    PUT_ITEM_TOOL,
+    GET_ITEM_TOOL,
+    QUERY_CONTAINER_TOOL,
+    UPDATE_ITEM_TOOL,
+    GET_SECRET_TOOL,
+    CHECK_CERTIFICATE_EXPIRY_TOOL,
+  ],
 }));
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
@@ -193,6 +272,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         break;
       case "update_item":
         result = await updateItem(args);
+        break;
+      case "get_secret":
+        result = await getSecret(args);
+        break;
+      case "check_certificate_expiry":
+        result = await checkCertificateExpiry(args);
         break;
       default:
         return {
