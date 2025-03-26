@@ -105,6 +105,16 @@ const CHECK_CERTIFICATE_EXPIRY_TOOL: Tool = {
   },
 };
 
+const LIST_CERTIFICATES_TOOL: Tool = {
+  name: "list_certificates",
+  description: "Lists all available certificates in Azure Key Vault",
+  inputSchema: {
+    type: "object",
+    properties: {},
+  },
+  required: [],
+};
+
 async function updateItem(params: any) {
   try {
     const { id, updates } = params;
@@ -235,6 +245,27 @@ async function checkCertificateExpiry(params: any) {
   }
 }
 
+async function listCertificates() {
+  try {
+    const certificates = [];
+    for await (const certificateProperties of certificateClient.listPropertiesOfCertificates()) {
+      certificates.push(certificateProperties);
+    }
+
+    return {
+      success: true,
+      message: `Certificates listed successfully`,
+      certificates,
+    };
+  } catch (error) {
+    console.error("Error listing certificates:", error);
+    return {
+      success: false,
+      message: `Failed to list certificates: ${error}`,
+    };
+  }
+}
+
 const server = new Server(
   {
     name: "cosmosdb-mcp-server",
@@ -256,6 +287,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     UPDATE_ITEM_TOOL,
     GET_SECRET_TOOL,
     CHECK_CERTIFICATE_EXPIRY_TOOL,
+    LIST_CERTIFICATES_TOOL,
   ],
 }));
 
@@ -282,6 +314,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         break;
       case "check_certificate_expiry":
         result = await checkCertificateExpiry(args);
+        break;
+      case "list_certificates":
+        result = await listCertificates();
         break;
       default:
         return {

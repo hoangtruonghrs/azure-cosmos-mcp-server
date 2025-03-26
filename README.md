@@ -31,6 +31,7 @@ Here's all you need to do:
 - Run Azure Cosmos DB queries by just asking questions in plain English
 - Retrieve secret values from Azure Key Vault
 - Check whether a certificate in Azure Key Vault is nearly expired
+- List all available certificates in Azure Key Vault
 
 ## Quick Start 🚀
 
@@ -112,6 +113,13 @@ Claude: *fetches the secret value from Azure Key Vault and provides it to you*
 ```text
 You: "Check if the certificate 'myCertificate' is nearly expired"
 Claude: *checks the expiry date of the certificate in Azure Key Vault and informs you of the days remaining until expiry*
+```
+
+#### Listing All Available Certificates in Azure Key Vault
+
+```text
+You: "List all available certificates in Azure Key Vault"
+Claude: *lists all available certificates in Azure Key Vault and provides the details to you*
 ```
 
 ## Contributing
